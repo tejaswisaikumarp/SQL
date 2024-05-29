@@ -1,0 +1,27 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_market_badge`(
+	in Market varchar(45),
+    in FiscalYear year,
+    out result varchar(7)
+)
+BEGIN
+declare TotalSoldQuantity int default 0;
+if Market="" then
+set Market="india";
+end if;
+
+select 
+		dim_customer.market, 
+        sum(sold_quantity) as TotalSoldQuantity
+from dim_customer join fact_sales_monthly
+on dim_customer.customer_code=fact_sales_monthly.customer_code
+where get_fiscal_year(fact_sales_monthly.date)=FiscalYear and dim_customer.market=Market
+group by dim_customer.market
+order by TotalSoldQuantity;
+
+#Determine Market Range (Good, Silver)
+if TotalSoldQuantity > 5000000 then 
+	set result = "Gold";
+else
+	set result = "Silver";
+end if;
+END

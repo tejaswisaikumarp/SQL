@@ -1,0 +1,26 @@
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `view_sales_pre_invoice_discount` AS
+    SELECT 
+        `dim_customer`.`market` AS `market`,
+        `dim_customer`.`customer_code` AS `customer_code`,
+        `dim_product`.`product` AS `product`,
+        `dim_product`.`variant` AS `variant`,
+        `fact_sales_monthly`.`product_code` AS `product_code`,
+        `fact_sales_monthly`.`date` AS `date`,
+        `fact_sales_monthly`.`fiscal_year` AS `fiscal_year`,
+        `fact_sales_monthly`.`sold_quantity` AS `sold_quantity`,
+        `fact_gross_price`.`gross_price` AS `gross_price`,
+        ROUND((`fact_gross_price`.`gross_price` * `fact_sales_monthly`.`sold_quantity`),
+                2) AS `gross_price_total`,
+        `fact_pre_invoice_deductions`.`pre_invoice_discount_pct` AS `pre_invoice_discount_pct`
+    FROM
+        ((((`fact_sales_monthly`
+        JOIN `dim_customer` ON ((`dim_customer`.`customer_code` = `fact_sales_monthly`.`customer_code`)))
+        JOIN `dim_product` ON ((`dim_product`.`product_code` = `fact_sales_monthly`.`product_code`)))
+        JOIN `fact_gross_price` ON (((`fact_sales_monthly`.`product_code` = `fact_gross_price`.`product_code`)
+            AND (`fact_gross_price`.`fiscal_year` = `fact_sales_monthly`.`fiscal_year`))))
+        JOIN `fact_pre_invoice_deductions` ON (((`fact_sales_monthly`.`customer_code` = `fact_pre_invoice_deductions`.`customer_code`)
+            AND (`fact_pre_invoice_deductions`.`fiscal_year` = `fact_sales_monthly`.`fiscal_year`))))

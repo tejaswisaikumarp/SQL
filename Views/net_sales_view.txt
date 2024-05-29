@@ -1,0 +1,21 @@
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `net_sales_view` AS
+    SELECT 
+        `view_post_invoice_discount_view`.`date` AS `date`,
+        `view_post_invoice_discount_view`.`fiscal_year` AS `fiscal_year`,
+        `view_post_invoice_discount_view`.`customer_code` AS `customer_code`,
+        `view_post_invoice_discount_view`.`market` AS `market`,
+        `view_post_invoice_discount_view`.`product_code` AS `product_code`,
+        `view_post_invoice_discount_view`.`product` AS `product`,
+        `view_post_invoice_discount_view`.`variant` AS `variant`,
+        `view_post_invoice_discount_view`.`sold_quantity` AS `sold_quantity`,
+        `view_post_invoice_discount_view`.`gross_price_total` AS `gross_price_total`,
+        `view_post_invoice_discount_view`.`pre_invoice_discount_pct` AS `pre_invoice_discount_pct`,
+        `view_post_invoice_discount_view`.`net_invoice_sales` AS `net_invoice_sales`,
+        `view_post_invoice_discount_view`.`post_invoice_discount_percentage` AS `post_invoice_discount_percentage`,
+        ((1 - `view_post_invoice_discount_view`.`post_invoice_discount_percentage`) * `view_post_invoice_discount_view`.`net_invoice_sales`) AS `net_sales`
+    FROM
+        `view_post_invoice_discount_view`

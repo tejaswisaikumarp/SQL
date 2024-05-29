@@ -1,0 +1,17 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_top_n_customers_by_net_sales`(
+	in Fiscal_Year int,
+    in Market varchar(15),
+    in top_n tinyint
+)
+BEGIN
+SELECT 
+		dim_customer.customer,
+        round(sum(net_sales)/1000000,2) as net_sales_mln
+FROM gdb0041.net_sales_view
+join dim_customer on 
+		dim_customer.customer_code = gdb0041.net_sales_view.customer_code
+where fiscal_year=Fiscal_Year and gdb0041.net_sales_view.market = Market
+group by dim_customer.customer
+order by net_sales_mln desc
+limit top_n;
+END

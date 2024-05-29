@@ -1,0 +1,16 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_top_n_products_by_division`(
+		in FiscalYear int,
+        in top_n tinyint
+)
+BEGIN
+with cte3 as (select 
+	division, product, 
+    sum(sold_quantity) as total_quantity_sold
+from fact_sales_monthly join dim_product
+on fact_sales_monthly.product_code = dim_product.product_code
+where fiscal_year=FiscalYear
+group by division, product),
+	cte4 as (select *, dense_rank() over(partition by division order by total_quantity_sold desc) as DenseRank from cte3)
+
+select * from cte4 where DenseRank<=top_n;
+END

@@ -1,0 +1,14 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `top_n_products_by_net_sales`(
+   in Fiscal_Year int,
+   in top_n tinyint
+)
+BEGIN
+SELECT 
+		product,
+        round(sum(net_sales)/1000000,2) as net_sales
+FROM gdb0041.net_sales_view
+where fiscal_year=Fiscal_Year
+group by product
+order by net_sales desc
+limit top_n;
+END

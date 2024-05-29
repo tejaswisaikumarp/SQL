@@ -1,0 +1,12 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_monthly_gross_sales_for_a_customer`(
+		CustomerCode text
+)
+BEGIN
+select 
+		fact_sales_monthly.date, sum(round(fact_gross_price.gross_price*fact_sales_monthly.sold_quantity, 2)) as gross_price_total
+from fact_sales_monthly join fact_gross_price
+on fact_sales_monthly.product_code = fact_gross_price.product_code and fact_gross_price.fiscal_year = get_fiscal_year(fact_sales_monthly.date)
+where find_in_set(fact_sales_monthly.customer_code, CustomerCode)
+group by fact_sales_monthly.date
+order by date asc;
+END
